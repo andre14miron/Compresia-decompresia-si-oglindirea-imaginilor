@@ -11,6 +11,6 @@ typedef struct QuadtreeNode {
 
 int main()
 {
-    uint32_t nr_colors;
-    uint32_t nr_nodes;
+    uint32_t nr_colors; // nr. de blocuri cu informatie utila
+    uint32_t nr_nodes;  // nr. total de noduri ale arborelui cuaternar
 }
