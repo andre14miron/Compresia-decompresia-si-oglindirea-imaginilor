@@ -133,14 +133,14 @@ int main(int argc, char **argv)
             char type[2];
             int width, height, maxx;
             fscanf(fin,"%s%d%d%d", type, &width, &height, &maxx);
-            if(width*height) fseek(fin, 1, SEEK_CUR);
+            if(width * height) fseek(fin, 1, SEEK_CUR);
 
             /* citirea unei imagini intr-o matrice de pixeli */
             int i, j;
             pixel **pixels = calloc(width, sizeof(pixel *));
-            for(i=0; i<width; i++) {
+            for(i = 0; i < width; i++) {
                 pixels[i] = calloc(height, sizeof(pixel));
-                for(j=0; j<height; j++)
+                for(j = 0; j < height; j++)
                     fread(&pixels[i][j], sizeof(pixel), 1, fin);
             }
             fclose(fin);
@@ -169,7 +169,7 @@ int main(int argc, char **argv)
             /* eliberarea memoriei */
             free(array);
             free_Tree(Tree);
-            for(i=0; i<width; i++)
+            for(i = 0; i < width; i++)
                 free(pixels[i]);
             free(pixels);
 
