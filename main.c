@@ -175,6 +175,31 @@ int main(int argc, char **argv)
 
             k++;
         }
+
+        if(strcmp("-m", argv[k])==0) {
+            FILE *fin = fopen(argv[argc-2], "rb");
+            if(fin == NULL) {printf("Error: %s\n", argv[argc-2]); break;}
+
+            /* citirea antetului */
+            char type[2];
+            int width, height, maxx;
+            fscanf(fin,"%s%d%d%d", type, &width, &height, &maxx);
+            if(width * height) fseek(fin, 1, SEEK_CUR);
+
+            /* citirea unei imagini intr-o matrice de pixeli */
+            int i, j;
+            pixel **pixels = calloc(width, sizeof(pixel *));
+            for(i = 0; i < width; i++) {
+                pixels[i] = calloc(height, sizeof(pixel));
+                for(j = 0; j < height; j++)
+                    fread(&pixels[i][j], sizeof(pixel), 1, fin);
+            }
+            fclose(fin);
+
+            /* crearea arborelui cuaternar de compresie */
+            Quadtree *Tree;
+            Tree = create_Tree(atoi(argv[k+1]), 0, 0, width, height, pixels);
+        }
     }
 }
 
