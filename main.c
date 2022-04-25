@@ -121,85 +121,84 @@ void free_Tree(Quadtree *Tree)
 
 int main(int argc, char **argv)
 {
-    int k;
-    for(k=1; k<argc-2; k++) {
-        /* cerinta 1 : comprimarea unei imagini */
-        if(strcmp("-c",argv[k]) == 0) {
+    /* cerinta 1 : comprimarea unei imagini */
+    if(strcmp("-c",argv[1]) == 0) {
 
-            FILE *fin = fopen(argv[argc-2], "rb");
-            if(fin == NULL) {printf("Error: %s\n", argv[argc-2]); break;}
+        FILE *fin = fopen(argv[argc-2], "rb");
+        if(fin == NULL) {printf("Error: %s\n", argv[argc-2]); return 1;}
 
-            /* citirea antetului */
-            char type[2];
-            int width, height, maxx;
-            fscanf(fin,"%s%d%d%d", type, &width, &height, &maxx);
-            if(width * height) fseek(fin, 1, SEEK_CUR);
+        /* citirea antetului */
+        char type[2];
+        int width, height, maxx;
+        fscanf(fin,"%s%d%d%d", type, &width, &height, &maxx);
+        if(width * height) fseek(fin, 1, SEEK_CUR);
 
-            /* citirea unei imagini intr-o matrice de pixeli */
-            int i, j;
-            pixel **pixels = calloc(width, sizeof(pixel *));
-            for(i = 0; i < width; i++) {
-                pixels[i] = calloc(height, sizeof(pixel));
-                for(j = 0; j < height; j++)
-                    fread(&pixels[i][j], sizeof(pixel), 1, fin);
-            }
-            fclose(fin);
+        /* citirea unei imagini intr-o matrice de pixeli */
+        int i, j;
+        pixel **pixels = calloc(width, sizeof(pixel *));
+        for(i = 0; i < width; i++) {
+            pixels[i] = calloc(height, sizeof(pixel));
+            for(j = 0; j < height; j++)
+                fread(&pixels[i][j], sizeof(pixel), 1, fin);
+        }
+        fclose(fin);
 
-            /* crearea arborelui cuaternar de compresie */
-            Quadtree *Tree;
-            Tree = create_Tree(atoi(argv[k+1]), 0, 0, width, height, pixels);
+        /* crearea arborelui cuaternar de compresie */
+        Quadtree *Tree;
+        Tree = create_Tree(atoi(argv[2]), 0, 0, width, height, pixels);
 
-            uint32_t nr_colors = 0;  // nr. de blocuri cu info. utila
-            uint32_t nr_nodes = 0;   // nr. total de noduri al arborelui
-            count(Tree, &nr_colors, &nr_nodes);
+        uint32_t nr_colors = 0;  // nr. de blocuri cu info. utila
+        uint32_t nr_nodes = 0;   // nr. total de noduri al arborelui
+        count(Tree, &nr_colors, &nr_nodes);
             
-            /* crearea vectorului de tip struct Quadtree asociat arborelui*/
-            int index = 0;
-            QuadtreeNode *array = calloc(nr_nodes, sizeof(QuadtreeNode));
-            add(array, Tree, &index, height*width);
+        /* crearea vectorului de tip struct Quadtree asociat arborelui*/
+        int index = 0;
+        QuadtreeNode *array = calloc(nr_nodes, sizeof(QuadtreeNode));
+        add(array, Tree, &index, height*width);
 
-            /* scrierea in fisierul comprimat */
-            FILE *fout = fopen(argv[argc-1],"wb");
-            if(fout == NULL) {printf("Error: %s\n", argv[argc-1]); break;}
-            fwrite(&nr_colors, sizeof(uint32_t), 1, fout);
-            fwrite(&nr_nodes, sizeof(uint32_t), 1, fout);
-            fwrite(array, sizeof(QuadtreeNode), nr_nodes, fout);
-            fclose(fout);
+        /* scrierea in fisierul comprimat */
+        FILE *fout = fopen(argv[argc-1],"wb");
+        if(fout == NULL) {printf("Error: %s\n", argv[argc-1]); return;}
+        fwrite(&nr_colors, sizeof(uint32_t), 1, fout);
+        fwrite(&nr_nodes, sizeof(uint32_t), 1, fout);
+        fwrite(array, sizeof(QuadtreeNode), nr_nodes, fout);
+        fclose(fout);
 
-            /* eliberarea memoriei */
-            free(array);
-            free_Tree(Tree);
-            for(i = 0; i < width; i++)
-                free(pixels[i]);
-            free(pixels);
+        /* eliberarea memoriei */
+        free(array);
+        free_Tree(Tree);
+        for(i = 0; i < width; i++)
+            free(pixels[i]);
+        free(pixels);
 
-            k++;
+    }
+
+    if(strcmp("-m", argv[1])==0) {
+        FILE *fin = fopen(argv[argc-2], "rb");
+        if(fin == NULL) {printf("Error: %s\n", argv[argc-2]); return;}
+
+        /* citirea antetului */
+        char type[2];
+        int width, height, maxx;
+        fscanf(fin,"%s%d%d%d", type, &width, &height, &maxx);
+        if(width * height) fseek(fin, 1, SEEK_CUR);
+
+        /* citirea unei imagini intr-o matrice de pixeli */
+        int i, j;
+        pixel **pixels = calloc(width, sizeof(pixel *));
+        for(i = 0; i < width; i++) {
+            pixels[i] = calloc(height, sizeof(pixel));
+            for(j = 0; j < height; j++)
+                fread(&pixels[i][j], sizeof(pixel), 1, fin);
         }
+        fclose(fin);
 
-        if(strcmp("-m", argv[k])==0) {
-            FILE *fin = fopen(argv[argc-2], "rb");
-            if(fin == NULL) {printf("Error: %s\n", argv[argc-2]); break;}
+        /* crearea arborelui cuaternar de compresie */
+        Quadtree *Tree;
+        Tree = create_Tree(0, 0, 0, width, height, pixels);
 
-            /* citirea antetului */
-            char type[2];
-            int width, height, maxx;
-            fscanf(fin,"%s%d%d%d", type, &width, &height, &maxx);
-            if(width * height) fseek(fin, 1, SEEK_CUR);
-
-            /* citirea unei imagini intr-o matrice de pixeli */
-            int i, j;
-            pixel **pixels = calloc(width, sizeof(pixel *));
-            for(i = 0; i < width; i++) {
-                pixels[i] = calloc(height, sizeof(pixel));
-                for(j = 0; j < height; j++)
-                    fread(&pixels[i][j], sizeof(pixel), 1, fin);
-            }
-            fclose(fin);
-
-            /* crearea arborelui cuaternar de compresie */
-            Quadtree *Tree;
-            Tree = create_Tree(atoi(argv[k+1]), 0, 0, width, height, pixels);
-        }
+        if(strcmp(argv[2], "h") == 0)
+            h(Tree);
     }
 }
 
