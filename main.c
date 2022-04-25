@@ -119,6 +119,22 @@ void free_Tree(Quadtree *Tree)
     free(Tree);
 }
 
+void h(Quadtree *Tree)
+{
+    if(Tree->child1 == NULL) return;
+    h(Tree->child1);
+    h(Tree->child2);
+    h(Tree->child3);
+    h(Tree->child4);
+    Quadtree *temp = Tree->child1;
+    Tree->child1 = Tree->child2;
+    Tree->child2 = temp;
+
+    temp = Tree->child3;
+    Tree->child3 = Tree->child4;
+    Tree->child4 = temp;
+}
+
 int main(int argc, char **argv)
 {
     /* cerinta 1 : comprimarea unei imagini */
@@ -199,6 +215,16 @@ int main(int argc, char **argv)
 
         if(strcmp(argv[2], "h") == 0)
             h(Tree);
+
+        /* scrierea in fisierul comprimat */
+        FILE *fout = fopen(argv[argc-1],"wb");
+        if(fout == NULL) {printf("Error: %s\n", argv[argc-1]); return;}
+        fprintf(fout, "%s\n", type);
+        fprintf(fout, "%d %d\n", width, height);
+        fprintf(fout, "%d\n", maxx);
+        
+        
+        fclose(fout);
     }
 }
 
