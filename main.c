@@ -135,6 +135,23 @@ void h(Quadtree *Tree)
     Tree->child4 = temp;
 }
 
+Quadtree *Tree_from_array(QuadtreeNode *array, int index)
+{
+    Quadtree *Tree = calloc(1, sizeof(Quadtree));
+    Tree->Red = array[index].red;
+    Tree->Green = array[index].green;
+    Tree->Blue = array[index].blue;
+    
+    if(array[index].top_left == -1)
+        Tree->child1 = Tree->child2 = Tree->child3 = Tree->child4 = NULL;
+    else {
+        Tree->child1 = Tree_from_array(array, array[index].top_left);
+        Tree->child2 = Tree_from_array(array, array[index].top_right);
+        Tree->child3 = Tree_from_array(array, array[index].bottom_right);
+        Tree->child4 = Tree_from_array(array, array[index].bottom_left);
+    }
+}
+
 int main(int argc, char **argv)
 {
     /* cerinta 1 : comprimarea unei imagini */
@@ -189,6 +206,22 @@ int main(int argc, char **argv)
 
     }
 
+    /* cerinta 2 : decompresia unei imagini */
+    if(strcmp("-d", argv[1]) == 0) {
+        FILE *fin = fopen(argv[argc-2], "rb");
+        if(fin == NULL) {printf("Error: %s\n", argv[argc-2]); return;}
+
+        uint32_t nr_colors = 0;  // nr. de blocuri cu info. utila
+        uint32_t nr_nodes = 0;   // nr. total de noduri al arborelui
+        fread(&nr_colors, sizeof(uint32_t), 1, fin);
+        fread(&nr_nodes, sizeof(uint32_t), 1, fin);
+
+        QuadtreeNode *array = calloc(nr_nodes, sizeof(QuadtreeNode));
+        fread(array, sizeof(QuadtreeNode), nr_nodes, fin);
+
+        Quadtree *Tree = Tree_from_array(array, 0);
+    }
+
     if(strcmp("-m", argv[1])==0) {
         FILE *fin = fopen(argv[argc-2], "rb");
         if(fin == NULL) {printf("Error: %s\n", argv[argc-2]); return;}
@@ -222,7 +255,7 @@ int main(int argc, char **argv)
         fprintf(fout, "%s\n", type);
         fprintf(fout, "%d %d\n", width, height);
         fprintf(fout, "%d\n", maxx);
-        
+
         
         fclose(fout);
     }
