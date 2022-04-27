@@ -239,7 +239,7 @@ void write_PPM(char *filename, pixel **pixels, int size)
 
 int main(int argc, char **argv)
 {
-    /* cerinta 1 : comprimarea unei imagini */
+    /* cerinta 1 : compresia unei imagini */
     if(strcmp("-c",argv[1]) == 0) {
 
         /* crearea arborelui de compresie pentru o imagine dintr-un fisier */
@@ -301,6 +301,7 @@ int main(int argc, char **argv)
         free_Tree(Tree);
     }
 
+    /* Cerinta 3: oglindirea pe verticala sau orizontala */
     if(strcmp("-m", argv[1])==0) {
         /* crearea arborelui cuaternar de compresie */
         Quadtree *Tree = read_PPM(argv[argc-2], atoi(argv[3]));

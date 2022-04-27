@@ -1,0 +1,107 @@
+// Copyright 314CC Miron Andreea Cristiana
+
+Structuri de Date si Algoritmi
+
+Tema #2
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+	Proiectul consta in rezolvarea a 3 cerinte, insa utilizatorul poate 
+alege unul singur, aratand optiunea in argumentele date in linia de comanda:
+	1) compresia unei imagini: primul argument este "-c" urmat de factor
+	2) decompresia unei imagini: primul argument este "-d"
+	3) oglindirea pe verticala sau orizontala: primul argument este "-m", 
+urmat de optiunea pentru verticala("v") sau orizontala ("h")
+
+Urmeaza sa detaliez indeplinirea acestor task-uri.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Task #1 : compresia unei imagini
+
+	Pentru citirea datelor dintr-un fisier PPM, se apeleaza functia 
+read_PPM, ce returneaza arborele asociat imaginii citite. In cadrul acestei
+functii se realizeaza urmatoarele operatii:
+	- citirea antetului din fisier
+	- citirea imaginii si memorarea ei intr-o matrice de structuri de tip
+pixel, ce are ca si campuri red, green si blue 
+	- crearea arborelui cuaternar de compresie prin apelarea functiei 
+create_Tree
+	- eliberarea din memoriei a matricei de pixeli
+
+	Functia create_Tree returneaza adresa arborelui cuaternar de compresie,
+asociat unei matrici de pixeli. In cadrul acesteia se va calcula culoarea medie
+a blocului, unde coltul de stanga-sus are coordonate x si y, iar latimea 
+blocului este size. Pentru blocul respectiv se calculeaza scorul similaritatii.
+Se creeaza un nou nod in arbore si se verifica daca mai este nevoie de o 
+diviziune. In caz afirmativ, se repeta procedeul pentru fiecare copil al 
+nodului respectiv, altfel nodul devine frunza.
+
+	Dupa crearea arborelui se calculeaza numarul de blocuri cu informatie 
+utila in cadrul procesului de compresie(nr_colors) si numarul total de noduri 
+ale arborelui creat(nr_nodes) prin apelarea functiei count.
+
+	Pentru crearea vectorului asociat arborelui se aloca memorie si se 
+apeleaza functia add. 
+	In cadrul functiei add se efectueaza urmatoarele operatii:
+	- se adauga informatiile utile la pozitia k in vectorul array
+	- se memoreaza pozitia curenta intr-o variabila noua k_cur
+	- daca nodul curent din arbore este nod neterminal, atunci se vor
+scrie la copii indicii la care se vor gasi in arbore si adaugarea lor in vector
+, altfel indicii pentru copii vor fi -1.
+
+	Se scrie in fisierul de iesire datele cerute(nr_colors, nr_nodes si 
+vectorul de tip QuadtreeNode) si se elibereaza memoria. Pentru eliberarea 
+memoriei pentru arbore se apeleaza functia free_Tree.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Task #2 : decompresia unei imagini
+
+	Se citeste din fisierul comprimat numarul de blocuri cu informatie
+utila(nr_colors), numarul total de noduri(nr_nodes) si vectorul de structuri
+de tip QuadtreeNode asociat unui arbore.
+
+	Se creeaza arborele asociat vectorului respectiv prin apelarea functiei
+Tree_from_array. In cadrul acestei functii se asociaza valorile corespunzatoare
+fiecarui nod si legaturile intre un nod si copiii lui.
+
+	Pentru formarea imaginii alocam memorie pentru matricea de pixeli
+si se apeleaza functia image_from_tree. Aceasta creeaza imaginea pornind de la
+arborele asociat lui. In cadrul acesteia daca nodul care este analizat este
+frunza, atunci se completeaza matricea, altfel se parcurge arborele.
+
+	Scrierea datelor in fisierul PPM se realizeaza prin apelarea functiei
+write_PPM. In cadrul acesteia se efecteaza urmatoarele operatii: scrierea 
+antetului, scrierea imaginii in fisier binar si eliberarea din memorie a
+imaginii.
+
+	Se elibereaza memoria pentru vectorul si arborele asociat imaginii.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Task #3 : oglindirea pe verticala sau orizontala
+
+	Analog ca la task 1, se citesc datele din fisierul de intrare si se 
+formeaza arborele asociat imaginii prin apelarea functiei read_PPM.
+ 
+	Realizarea oglindirii se realizeaza fie prin apelarea functiei h(
+daca utilizatorul a optat pentru oglindirea pe orizontala) sau v(daca 
+utilizatorul a ales pentru oglindirea pe verticala). In cadrul acestora, se
+apeleaza functia swap_children unde interschimba 2 copii ai unui nod.
+
+	Functia h: parcugerea se realizeaza de la frunze pana la radacina si 
+se interschimba copilul 1 cu copilul 2 si copilul 3 cu copilul 4 pentru fiecare
+nod neterminal. 
+
+	Functia v: parcugerea se realizeaza de la frunze pana la radacina si 
+se interschimba copilul 1 cu copilul 4 si copilul 2 cu copilul 3 pentru fiecare
+nod neterminal. 
+
+	Analog ca la task 2, se formeaza imaginea pornind de la arbore prin
+apelarea functiei image_from_tree si se scrie in fisierul de tip PPM prin
+apelarea functiei write_PPM.
+
+	Se elibereaza din memorie arborele creat.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
